@@ -1,7 +1,10 @@
+require('dotenv').config(); // Recommended way of loading dotenv
+import container from "../inversify.config";
+import {TYPES} from "./types";
+import {LePriseurBot} from "./bot/LePriseurBot";
 import express from "express";
 import path from "path";
 import bodyParser from "body-parser";
-import {LePriseurBot} from "./bot/LePriseurBot";
 
 export const app = express();
 let env = process.env.NODE_ENV;
@@ -11,7 +14,12 @@ let botToken = process.env.BOT_TOKEN;
 app.use(bodyParser.urlencoded({extended: true}));
 
 // Bot
-const bot = new LePriseurBot(botToken);
+let bot = container.get<LePriseurBot>(TYPES.LePriseurBot);
+bot.listen().then(() => {
+    console.log('Logged in!')
+}).catch((error) => {
+    console.log('Oh no! ', error)
+});
 
 // Routes
 // Root listener
@@ -25,12 +33,3 @@ app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
     console.log('Press Ctrl+C to quit.');
 });
-
-// Make process available
-declare var process : {
-    env: {
-        NODE_ENV: string,
-        BOT_TOKEN: string,
-        PORT: number
-    }
-}
