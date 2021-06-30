@@ -21,3 +21,8 @@ export class MessageResponder {
         return Promise.reject();
     }
 }
+
+export interface IMessageInterpreter {
+    isHandled(message: Message): boolean;
+    handle(message: Message): Promise<Message | Message[]>;
+}
