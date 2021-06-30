@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {Container} from "inversify";
 import {TYPES} from "./src/types";
-import {LePriseurBot} from "./src/bot/LePriseurBot";
+import {LePriseurBot} from "./src/bot/le-priseur-bot";
 import {Client} from "discord.js";
 import { MessageResponder } from "./src/services/message-responder";
 import { PingFinder } from "./src/services/ping-finder";

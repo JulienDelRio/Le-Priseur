@@ -1,7 +1,7 @@
 require('dotenv').config(); // Recommended way of loading dotenv
 import container from "../inversify.config";
 import {TYPES} from "./types";
-import {LePriseurBot} from "./bot/LePriseurBot";
+import {LePriseurBot} from "./bot/le-priseur-bot";
 import express from "express";
 import path from "path";
 import bodyParser from "body-parser";
