@@ -21,6 +21,11 @@ export abstract class AbstractCommandInterpreter implements IMessageInterpreter 
         return command;
     }
 
+    getFullCommand(message: Message): String {
+        let command = message.content.substring(1).toLowerCase();
+        return command;
+    }
+
     isCommand(message: Message): boolean {
         return message.content.startsWith(this.commandChar)
     }

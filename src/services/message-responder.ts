@@ -32,3 +32,4 @@ export interface IMessageInterpreter {
 
     handle(message: Message): Promise<Message | Message[]>;
 }
+
