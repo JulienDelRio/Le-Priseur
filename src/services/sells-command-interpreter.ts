@@ -30,26 +30,75 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
         let splittedCommand = fullCommand.split(" ");
         let command = splittedCommand.shift();
         if (splittedCommand.length == 0) {
-            throw new Error("Il manque des informations.\n" +
-                "Pour plus d'informations : =vendre aide")
-        } else if ("aide".match(splittedCommand[0])) {
+            throw this.getErrorNotEnoughParam()
+        } else if (splittedCommand[0].match("aide")) {
             return this.handleSellHelp(message);
         } else if (splittedCommand.length < 5) {
-            throw new Error("Il manque des informations.\n" +
-                "Pour plus d'informations : =vendre aide")
+            throw this.getErrorNotEnoughParam()
         } else {
             let sendCommand = this.getSellCommand(splittedCommand);
-            return this.handleSellCommand(sendCommand)
+            return this.handleSellCommand(message, sendCommand)
         }
     }
 
-    private handleSellCommand(sendCommand: SellCommand): Promise<Message | Message[]> {
-        throw new Error("Method not implemented.");
+    private getErrorNotEnoughParam() {
+        return new Error("Il manque des informations.\n" +
+            "Pour plus d'informations : =vendre aide");
+    }
+
+    private getErrorNotGoodParam(value: string) {
+        return new Error("La valeur " + value + " n'est pas bien renseignée.\n" +
+            "Pour plus d'informations : =vendre aide");
+    }
+
+    private handleSellCommand(message: Message, sendCommand: SellCommand): Promise<Message | Message[]> {
+        return message.channel.send("Je vends " + sendCommand.ressourceCount + " " + sendCommand.ressourceType + ":meat_on_bone: \n" +
+            "Prix de départ : " + sendCommand.ressourcePrice + "/u, (+ frais de la boutique)\n" +
+            "Enchères 💸 : + " + sendCommand.bidStep + "/u minimum\n" +
+            "\n" +
+            "Fin de l'enchère : XXhXX\n" +
+            "\n" +
+            "<@!" + message.author.id + ">");
     }
 
     private getSellCommand(params: string[]): SellCommand {
+        if (params.length < 5) {
+            throw this.getErrorNotEnoughParam();
+        }
 
-        return new SellCommand(RessourceType.Meats);
+        // Check res count
+        let param1 = params[0];
+        let resCount = parseInt(param1);
+        if (isNaN(resCount))
+            throw this.getErrorNotGoodParam("du nombre d'unités")
+
+        // Check res type
+        let param2 = params[1];
+        let resType: RessourceType;
+        switch (param2) {
+            case "viandes":
+                resType = RessourceType.Meats;
+                break
+            case "outils":
+                resType = RessourceType.Tools;
+                break
+            default :
+                throw this.getErrorNotGoodParam("du type de ressource")
+        }
+
+        // Check price per res
+        let param3 = params[2];
+        let resPrice = parseInt(param3);
+        if (isNaN(resPrice))
+            throw this.getErrorNotGoodParam("du prix de la ressource")
+
+        // Check price per res
+        let param4 = params[3];
+        let bidStep = parseInt(param4);
+        if (isNaN(bidStep))
+            throw this.getErrorNotGoodParam("du palier d'enchère")
+
+        return new SellCommand(resCount, resType, resPrice, bidStep);
     }
 
     private handleSellHelp(message: Message): Promise<Message | Message[]> {
@@ -68,16 +117,37 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
 }
 
 class SellCommand {
-    private ressource: RessourceType;
+    private _ressourceType: RessourceType;
+    private _ressourceCount: Number;
+    private _ressourcePrice: Number;
+    private _bidStep: Number;
 
-    constructor(ressourceType: RessourceType) {
-        this.ressource = ressourceType;
+    constructor(resCount: Number, resType: RessourceType, resPrice: Number, bidStep: Number) {
+        this._ressourceCount = resCount;
+        this._ressourceType = resType;
+        this._ressourcePrice = resPrice;
+        this._bidStep = bidStep;
     }
 
+
+    get ressourceType(): RessourceType {
+        return this._ressourceType;
+    }
+
+    get ressourceCount(): Number {
+        return this._ressourceCount;
+    }
+
+    get ressourcePrice(): Number {
+        return this._ressourcePrice;
+    }
+
+    get bidStep(): Number {
+        return this._bidStep;
+    }
 }
 
 enum RessourceType {
-    Meats,
-    Tools,
-    EternalPose
+    Meats = "viandes",
+    Tools = "outils"
 }
