@@ -17,10 +17,14 @@ export class MessageResponder {
     }
 
     handle(message: Message): Promise<Message | Message[]> {
-        if (this.pingFinder.isPing(message.content)) {
-            return message.reply('pong!');
-        } else if (this.sellsCommand.isHandled(message)) {
-            return this.sellsCommand.handle(message)
+        try {
+            if (this.pingFinder.isPing(message.content)) {
+                return message.reply('pong!');
+            } else if (this.sellsCommand.isHandled(message)) {
+                return this.sellsCommand.handle(message)
+            }
+        } catch (e) {
+            return message.reply(e.message)
         }
 
         return Promise.reject();
