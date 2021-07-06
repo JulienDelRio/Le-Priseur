@@ -52,8 +52,10 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
     }
 
     private handleSellCommand(message: Message, sendCommand: SellCommand): Promise<Message | Message[]> {
+        let shopPrice: number = sendCommand.ressourceCount * getRessourceTypeSpec(sendCommand.ressourceType).shopPrice;
         return message.channel.send("Je vends " + sendCommand.ressourceCount + " " + sendCommand.ressourceType + ":meat_on_bone: \n" +
-            "Prix de départ : " + sendCommand.ressourcePrice + "/u, (+ frais de la boutique)\n" +
+            "Prix de départ : " + sendCommand.ressourcePrice + "/u, (+ " + shopPrice + " berrys de frais de" +
+            " boutique)\n" +
             "Enchères 💸 : + " + sendCommand.bidStep + "/u minimum\n" +
             "\n" +
             "Fin de l'enchère : XXhXX\n" +
@@ -118,11 +120,11 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
 
 class SellCommand {
     private _ressourceType: RessourceType;
-    private _ressourceCount: Number;
-    private _ressourcePrice: Number;
-    private _bidStep: Number;
+    private _ressourceCount: number;
+    private _ressourcePrice: number;
+    private _bidStep: number;
 
-    constructor(resCount: Number, resType: RessourceType, resPrice: Number, bidStep: Number) {
+    constructor(resCount: number, resType: RessourceType, resPrice: number, bidStep: number) {
         this._ressourceCount = resCount;
         this._ressourceType = resType;
         this._ressourcePrice = resPrice;
@@ -134,15 +136,15 @@ class SellCommand {
         return this._ressourceType;
     }
 
-    get ressourceCount(): Number {
+    get ressourceCount(): number {
         return this._ressourceCount;
     }
 
-    get ressourcePrice(): Number {
+    get ressourcePrice(): number {
         return this._ressourcePrice;
     }
 
-    get bidStep(): Number {
+    get bidStep(): number {
         return this._bidStep;
     }
 }
@@ -150,4 +152,24 @@ class SellCommand {
 enum RessourceType {
     Meats = "viandes",
     Tools = "outils"
+}
+
+interface RessourceTypeSpec {
+    label: string,
+    shopPrice: number
+}
+
+function getRessourceTypeSpec(ressourceType: RessourceType): RessourceTypeSpec {
+    switch (ressourceType) {
+        case RessourceType.Meats:
+            return {
+                label: "viandes",
+                shopPrice: 10
+            }
+        case RessourceType.Tools:
+            return {
+                label: "outils",
+                shopPrice: 10
+            }
+    }
 }
