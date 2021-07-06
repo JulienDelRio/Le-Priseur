@@ -2,15 +2,15 @@ import {Message} from "discord.js";
 import {PingFinder} from "./ping-finder";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../types";
-import {SellsCommand} from "./sells-command";
+import {SellsCommandInterpreter} from "./sells-command-interpreter";
 
 @injectable()
 export class MessageResponder {
     private pingFinder: PingFinder;
-    private sellsCommand: SellsCommand;
+    private sellsCommand: SellsCommandInterpreter;
 
     constructor(
-        @inject(TYPES.PingFinder) pingFinder: PingFinder, @inject(TYPES.SellsCommand) sellsCommand: SellsCommand
+        @inject(TYPES.PingFinder) pingFinder: PingFinder, @inject(TYPES.SellsCommand) sellsCommand: SellsCommandInterpreter
     ) {
         this.pingFinder = pingFinder;
         this.sellsCommand = sellsCommand;

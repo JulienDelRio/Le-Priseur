@@ -4,7 +4,7 @@ import {TYPES} from "../types";
 import {IMessageInterpreter} from "./message-responder"
 
 @injectable()
-export abstract class AbstractCommand implements IMessageInterpreter {
+export abstract class AbstractCommandInterpreter implements IMessageInterpreter {
     private commandChar: string;
 
     constructor(

@@ -1,10 +1,10 @@
 import {Message} from "discord.js";
 import {injectable} from "inversify";
-import {AbstractCommand} from "./abstract-command";
+import {AbstractCommandInterpreter} from "./abstract-command-interpreter";
 import {IMessageInterpreter} from "./message-responder"
 
 @injectable()
-export class SellsCommand extends AbstractCommand {
+export class SellsCommandInterpreter extends AbstractCommandInterpreter {
 
     isHandled(message: Message): boolean {
         switch (this.getCommand(message)) {
@@ -27,4 +27,18 @@ export class SellsCommand extends AbstractCommand {
     handleSell(message: Message) {
         return message.reply('VENDU')
     }
+
+    getSellCommand(message: Message): SellCommand {
+        return new SellCommand("coucou");
+    }
+
+}
+
+class SellCommand {
+    private ressource: string;
+
+    constructor(ressource: string) {
+        this.ressource = ressource;
+    }
+
 }
