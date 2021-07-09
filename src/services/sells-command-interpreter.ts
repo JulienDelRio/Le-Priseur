@@ -3,6 +3,7 @@ import {injectable} from "inversify";
 import {AbstractCommandInterpreter} from "./abstract-command-interpreter";
 import {IMessageInterpreter} from "./message-responder"
 import * as Console from "console";
+import moment, {Moment} from "moment";
 
 @injectable()
 export class SellsCommandInterpreter extends AbstractCommandInterpreter {
@@ -58,7 +59,7 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
             " boutique)\n" +
             "Enchères 💸 : + " + sendCommand.bidStep + "/u minimum\n" +
             "\n" +
-            "Fin de l'enchère : XXhXX\n" +
+            "Fin de l'enchère : " + sendCommand.dateLimit.format("DD/MM/YY à HH:mm") + "\n" +
             "\n" +
             "<@!" + message.author.id + ">");
     }
@@ -100,7 +101,15 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
         if (isNaN(bidStep))
             throw this.getErrorNotGoodParam("du palier d'enchère")
 
-        return new SellCommand(resCount, resType, resPrice, bidStep);
+        // Check price per res
+        let param5 = params[4];
+        let dateLimit: Moment = moment(param5, "D/M-H:m", true);
+        if (!dateLimit.isValid()) {
+            console.log(dateLimit.parsingFlags())
+            throw this.getErrorNotGoodParam("de la date limite")
+        }
+
+        return new SellCommand(resCount, resType, resPrice, bidStep, dateLimit);
     }
 
     private handleSellHelp(message: Message): Promise<Message | Message[]> {
@@ -123,12 +132,14 @@ class SellCommand {
     private _ressourceCount: number;
     private _ressourcePrice: number;
     private _bidStep: number;
+    private _dateLimit: Moment;
 
-    constructor(resCount: number, resType: RessourceType, resPrice: number, bidStep: number) {
+    constructor(resCount: number, resType: RessourceType, resPrice: number, bidStep: number, dateLimit: Moment) {
         this._ressourceCount = resCount;
         this._ressourceType = resType;
         this._ressourcePrice = resPrice;
         this._bidStep = bidStep;
+        this._dateLimit = dateLimit;
     }
 
 
@@ -146,6 +157,10 @@ class SellCommand {
 
     get bidStep(): number {
         return this._bidStep;
+    }
+
+    get dateLimit(): Moment {
+        return this._dateLimit;
     }
 }
 
