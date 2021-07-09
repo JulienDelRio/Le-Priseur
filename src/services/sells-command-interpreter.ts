@@ -4,9 +4,11 @@ import {AbstractCommandInterpreter} from "./abstract-command-interpreter";
 import {IMessageInterpreter} from "./message-responder"
 import * as Console from "console";
 import moment, {Moment} from "moment";
+import {emojiCharacters} from "../utils/emojicharacters"
 
 @injectable()
 export class SellsCommandInterpreter extends AbstractCommandInterpreter {
+    private pastCommandMessages: Message[] = [];
 
     isHandled(message: Message): boolean {
         switch (this.getCommand(message)) {
@@ -37,9 +39,29 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
         } else if (splittedCommand.length < 5) {
             throw this.getErrorNotEnoughParam()
         } else {
-            let sendCommand = this.getSellCommand(splittedCommand);
-            return this.handleSellCommand(message, sendCommand)
+            let sentCommand = this.getSellCommand(splittedCommand);
+            let sellPromise = this.handleSellCommand(message, sentCommand);
+            sellPromise.then(postedMessageOrMessages => {
+                if (Array.isArray(postedMessageOrMessages)) {
+                    let postedMessages: Message[] = <Message[]>postedMessageOrMessages;
+                    for (const postedMessage of postedMessages) {
+                        this.postProdCommand(postedMessage, sentCommand);
+                    }
+                } else {
+                    let postedMessage: Message = <Message>postedMessageOrMessages;
+                    this.postProdCommand(postedMessage, sentCommand);
+                }
+            })
+            return sellPromise;
         }
+    }
+
+    private postProdCommand(postedMessage: Message, sentCommand: SellCommand) {
+        this.pastCommandMessages.push(postedMessage);
+        postedMessage.react(emojiCharacters[1]);
+        postedMessage.react(emojiCharacters[2]);
+        postedMessage.react(emojiCharacters[3]);
+        postedMessage.react(emojiCharacters[4]);
     }
 
     private getErrorNotEnoughParam() {
