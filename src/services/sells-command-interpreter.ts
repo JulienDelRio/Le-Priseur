@@ -4,7 +4,8 @@ import {AbstractCommandInterpreter} from "./abstract-command-interpreter";
 import {IMessageInterpreter} from "./message-responder"
 import * as Console from "console";
 import moment, {Moment} from "moment";
-import {emojiCharacters} from "../utils/emojicharacters"
+import {emojiCharacters} from "../utils/emojicharacters";
+import disbut from 'discord-buttons';
 
 @injectable()
 export class SellsCommandInterpreter extends AbstractCommandInterpreter {
@@ -76,14 +77,19 @@ export class SellsCommandInterpreter extends AbstractCommandInterpreter {
 
     private handleSellCommand(message: Message, sendCommand: SellCommand): Promise<Message | Message[]> {
         let shopPrice: number = sendCommand.ressourceCount * getRessourceTypeSpec(sendCommand.ressourceType).shopPrice;
-        return message.channel.send("Je vends " + sendCommand.ressourceCount + " " + sendCommand.ressourceType + ":meat_on_bone: \n" +
+        let contentMessage = "Je vends " + sendCommand.ressourceCount + " " + sendCommand.ressourceType + ":meat_on_bone: \n" +
             "Prix de départ : " + sendCommand.ressourcePrice + "/u, (+ " + shopPrice + " berrys de frais de" +
             " boutique)\n" +
             "Enchères 💸 : + " + sendCommand.bidStep + "/u minimum\n" +
             "\n" +
             "Fin de l'enchère : " + sendCommand.dateLimit.format("DD/MM/YY à HH:mm") + "\n" +
             "\n" +
-            "<@!" + message.author.id + ">");
+            "<@!" + message.author.id + ">";
+        let button = new disbut.MessageButton()
+            .setStyle('red')
+            .setLabel('My First Button!')
+            .setID('click_to_function');
+        return message.channel.send(contentMessage, button);
     }
 
     private getSellCommand(params: string[]): SellCommand {

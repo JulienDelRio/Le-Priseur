@@ -2,6 +2,7 @@ import {Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../types";
 import {MessageResponder} from "../services/message-responder";
+import disbut from 'discord-buttons';
 
 @injectable()
 export class LePriseurBot {
@@ -14,6 +15,7 @@ export class LePriseurBot {
         @inject(TYPES.Token) token: string,
         @inject(TYPES.MessageResponder) messageResponder: MessageResponder) {
         this.client = client;
+        disbut(this.client);
         this.token = token;
         this.messageResponder = messageResponder;
     }
